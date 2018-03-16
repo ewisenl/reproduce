@@ -1,5 +1,5 @@
 # Change this name to something that makes sense for your project
-name: changeme
+name: reproduce
 
 # Use the recipe appropriate for your application.
 recipe: drupal8
@@ -23,24 +23,19 @@ config:
   # Specify the version to match what's in services.yaml.
   database: mariadb:10.1
 
-# Url's for aditional services. Replace changeme with the project name
+# Url's for aditional services. Replace reproduce with the project name
 proxy:
   smtp:
-    - mail.changeme.lndo.site
+    - mail.reproduce.lndo.site
 
 # The following additional build step will install the Platform CLI
 # in the application container and auto-run `composer install`
 services:
   appserver:
     build:
-      - "cd /tmp && curl -sS https://platform.sh/cli/installer | php || true" # FIXME: Check forced success is still nessesary.
       - "composer global require hirak/prestissimo"
       - "cd $LANDO_MOUNT && composer install"
-    overrides:
-      services:
-        environment:
-          BEHAT_PARAMS: '{"extensions" : {"Behat\\MinkExtension" : {"base_url" : "http://nginx/"}, "Drupal\\DrupalExtension" : {"drush" :   {  "root":  "/app/web" }}}}'
-
+    
   # Portforward can be set to a specific port for a subprocject
   # Imports default.sql.gz on first build. Use `lando db-export default.sql` to generate or update this file
   database:
@@ -64,10 +59,6 @@ events:
 # The following entry creates a `lando platform` command that will run
 # any Platform CLI command from inside the container if desired.
 tooling:
-  platform:
-    service: appserver
-    description: Run Platform CLI commands
-    cmd: /var/www/.platformsh/bin/platform
   phplint:
     service: appserver
     cmd: /app/vendor/bin/phplint
